@@ -7,12 +7,12 @@ import org.springframework.web.servlet.view.{InternalResourceViewResolver, JstlV
 class Config {
 
     @Bean
-    def viewResolver() = {
+    def viewResolver = {
         val viewResolver = new InternalResourceViewResolver
         viewResolver.setViewClass(classOf[JstlView])
         viewResolver.setPrefix("/WEB-INF/views/")
         viewResolver.setSuffix(".jsp")
-        viewResolver;
+        viewResolver
     }
 
 }
