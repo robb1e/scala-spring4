@@ -1,11 +1,10 @@
 package com.robb1e.helloworld
 
-import org.springframework.context.annotation.{Bean, ComponentScan, Configuration}
-import org.springframework.web.servlet.config.annotation.{EnableWebMvc, WebMvcConfigurerAdapter}
+import org.springframework.context.annotation.{Bean, ComponentScan}
 import org.springframework.web.servlet.view.{InternalResourceViewResolver, JstlView}
 
-@Configuration @EnableWebMvc @ComponentScan(basePackages = Array("com.robb1e.helloworld"))
-class Config extends WebMvcConfigurerAdapter {
+@ComponentScan(basePackages = Array("com.robb1e.helloworld"))
+class Config {
 
     @Bean
     def viewResolver() = {
