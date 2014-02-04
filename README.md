@@ -43,29 +43,31 @@ I think there's a natural tendency when you hear 'Spring' to think 'Java', but I
 * [Spring](http://spring.io)
 * [Scala](http://www.scala-lang.org/)
 
+## Project setup
+
 So first off, you'll notice I'm not using [Maven](http://maven.apache.org/) or [Gradle](http://www.gradle.org/) but SBT. This is the `build.sbt` file which outlines the name and version of the application along with the Scala version. It pulls in the `webSettings` from a plugin which I'll drop into in a moment. Then it outlines the dependencies, `spring-mvc` for the web component of the application, `jetty-container` is required for the complication and runtime while `jetty-jsp` is only required for the runtime used by the plugin. 
 
 
-		name := "Hello World"
+    name := "Hello World"
 
-		version := "1.0"
+    version := "1.0"
 
-		scalaVersion := "2.10.2"
+    scalaVersion := "2.10.2"
 
-		seq(webSettings : _*)
+    seq(webSettings : _*)
 
-		libraryDependencies ++= Seq(
-  			"org.springframework" % "spring-webmvc" % "4.0.0.RELEASE",
-  			"org.eclipse.jetty" % "jetty-webapp" % "9.1.0.v20131115" % "container, compile",
-  			"org.eclipse.jetty" % "jetty-jsp" % "9.1.0.v20131115" % "container"
-		)
+      libraryDependencies ++= Seq(
+          "org.springframework" % "spring-webmvc" % "4.0.0.RELEASE",
+          "org.eclipse.jetty" % "jetty-webapp" % "9.1.0.v20131115" % "container, compile",
+          "org.eclipse.jetty" % "jetty-jsp" % "9.1.0.v20131115" % "container"
+          )
 
 In `projects/plugins.sbt` there are two plugins, one for running the web application within SBT and the other to create [IntelliJ](http://www.jetbrains.com/idea/) project files.
 
-		addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "0.6.0")
+    addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "0.6.0")
 
-		addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.5.2")
-		
+    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.5.2")
+
 The project uses the 'standard' Java convention of having a `src` folder at the root, followed by `webapp` which includes the web application configuration and static resources as well as the source folder called `scala`. Within the `scala` directory there is a namespaced directory structure of `com/robb1e/helloworld` although in Scala unlike in Java there is not a one to one mapping of file to classname. But let's first head into `webapp/WEB-INF/web.xml`. This is the deployment descriptor from the [Servlet standard](http://en.wikipedia.org/wiki/Java_Servlet). 
 
 We essentially are telling Spring to handle all HTTP requests from the root context (i.e. '/'). We are also passing a reference to a configuration class, in this case `com.robb1e.helloworld.Config`. 
