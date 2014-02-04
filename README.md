@@ -70,7 +70,56 @@ In `projects/plugins.sbt` there are two plugins, one for running the web applica
 
 The project uses the 'standard' Java convention of having a `src` folder at the root, followed by `webapp` which includes the web application configuration and static resources as well as the source folder called `scala`. Within the `scala` directory there is a namespaced directory structure of `com/robb1e/helloworld` although in Scala unlike in Java there is not a one to one mapping of file to classname. But let's first head into `webapp/WEB-INF/web.xml`. This is the deployment descriptor from the [Servlet standard](http://en.wikipedia.org/wiki/Java_Servlet). 
 
+## Configuration
+
 We essentially are telling Spring to handle all HTTP requests from the root context (i.e. '/'). We are also passing a reference to a configuration class, in this case `com.robb1e.helloworld.Config`. 
+
+This configuration uses Spring annotations `@ComponentScan` to declare which package to look for Spring wiring to occur in. The `@Bean` annotation makes the `viewResolver` available which is required by the controller to render HTML.
+
+    package com.robb1e.helloworld
+
+    import org.springframework.context.annotation.{Bean, ComponentScan}
+    import org.springframework.web.servlet.view.{InternalResourceViewResolver, JstlView}
+
+    @ComponentScan(basePackages = Array("com.robb1e.helloworld"))
+    class Config {
+
+        @Bean
+        def viewResolver = {
+            val viewResolver = new InternalResourceViewResolver
+            viewResolver.setViewClass(classOf[JstlView])
+            viewResolver.setPrefix("/WEB-INF/views/")
+            viewResolver.setSuffix(".jsp")
+            viewResolver
+        }
+
+    }
+
+See this great writeup for more on [Spring MVC Configuration](http://www.luckyryan.com/2013/02/07/migrate-spring-mvc-servlet-xml-to-java-config/).
+
+## Dependencies
+
+To show a simple dependency this example includes a 'service' which provides the name to render in HTML.
+
+    package com.robb1e.helloworld
+
+    import org.springframework.stereotype.Service
+
+    trait HelloWorldName {
+      def name: String
+    }
+
+    @Service
+    class HelloWorldService extends HelloWorldName {
+
+      def name = "world"
+
+    }
+
+The `trait` isn't strictly required, but enables me to introduce the comparison between [Java Interfaces](http://docs.oracle.com/javase/tutorial/java/concepts/interface.html).
+
+
+
 
 
 
