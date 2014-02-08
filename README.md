@@ -116,12 +116,62 @@ To show a simple dependency this example includes a 'service' which provides the
 
     }
 
-The `trait` isn't strictly required, but enables me to introduce the comparison between [Java Interfaces](http://docs.oracle.com/javase/tutorial/java/concepts/interface.html).
+The `trait` isn't strictly required, but enables me to introduce the comparison between [Java Interfaces](http://docs.oracle.com/javase/tutorial/java/concepts/interface.html) and how they are used in testing.
 
+The dependency of the `HelloWorldName` gets injected into the controller using the `autowired` command in the class definition. The class has a constructor which requires a `HelloWorldName` class and that's created and injected from the snippet above. 
 
+    package com.robb1e.helloworld
 
+    import org.springframework.beans.factory.annotation.Autowired
+    import org.springframework.stereotype.Controller
+    import org.springframework.ui.Model
+    import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod}
 
+    @Controller
+    @RequestMapping(Array("/"))
+    class HelloWorldController @Autowired() (helloWorldService: HelloWorldName) {
 
+      @RequestMapping(method = Array(RequestMethod.GET))
+      def index (model: Model) = {
+        model.addAttribute("name", helloWorldService.name)
+        "index"
+      }
+    }
 
+## Controller
 
+There's a lot going on here, let's break it down, starting with the package definition. The interesting thing with Scala is the package isn't dependent on the directory structure. In the example it is, but it doesn't need to be. Say good bye to those empty directories.
 
+    package com.robb1e.helloworld
+
+We have to import a few classes, `Autowired` for the automatic injecting of dependencies; `Controller` to declare what type of class this is, `Model` to hold the variables to be passed down to the view. The last line includes two imports in one line, `RequestMapping` and `RequestMethod` for the path and HTTP method being used. In Java you'd need to import these classes separately or have a wildcard import.
+
+    import org.springframework.beans.factory.annotation.Autowired
+    import org.springframework.stereotype.Controller
+    import org.springframework.ui.Model
+    import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod}
+
+Here we declare that this class is a controller and it listens to the path '/'. We also declare it to be autowired and define the `HelloWorldName` dependency.
+
+    @Controller
+    @RequestMapping(Array("/"))
+    class HelloWorldController @Autowired() (helloWorldService: HelloWorldName) {
+
+Now we map our method to the HTTP method that comes through on the path this class is listening too. We receive the model and add our name to it so that it's used in the view.
+
+      @RequestMapping(method = Array(RequestMethod.GET))
+      def index (model: Model) = {
+        model.addAttribute("name", helloWorldService.name)
+        "index"
+      }
+    }
+    
+## View
+
+Finally we have a simple `JSP` which uses the `name` variable passed into it from the controller which it's dependency injected into it.
+
+    <h1>Hello, ${name}</h1>
+
+# Wrap up
+
+If you've followed this through, you've just got a glimpse of what Scala can provide, and how it can work with your existing tools.
