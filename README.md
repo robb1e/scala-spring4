@@ -34,9 +34,9 @@ There is a plugin which will build IntelliJ project files, run `sbt` and run the
 
 # Why?
 
-In my previous job at [The Guardian](http://www.guardian.co.uk) I used Scala on various projects and enjoyed it. We employed various [dependency injection](http://en.wikipedia.org/wiki/Dependency_injection) (DI) frameworks from [Spring](http://spring.io), [Guice](http://code.google.com/p/google-guice/) and a lightweight homegrow pattern. Now I'm at [Pivotal Labs](http://www.pivotallabs.com) Spring is part of [the family](http://www.gopivotal.com) and some recent [JVM](http://en.wikipedia.org/wiki/Java_virtual_machine) projects combined with the recent release of [Spring 4](http://spring.io/blog/2013/12/12/announcing-spring-framework-4-0-ga-release) means we've been looking at how these tools can help our clients.
+In my previous job at [The Guardian](http://www.guardian.co.uk) I used Scala on various projects and enjoyed it. We employed various [dependency injection](http://en.wikipedia.org/wiki/Dependency_injection) (DI) frameworks from [Spring](http://spring.io), [Guice](http://code.google.com/p/google-guice/) and a lightweight homegrow version. Now I'm at [Pivotal Labs](http://www.pivotallabs.com) Spring is part of [the family](http://www.gopivotal.com) and some recent [JVM](http://en.wikipedia.org/wiki/Java_virtual_machine) projects combined with the recent release of [Spring 4](http://spring.io/blog/2013/12/12/announcing-spring-framework-4-0-ga-release) means we've been looking at how these tools can help our clients.
 
-I think there's a natural tendency when you hear 'Spring' to think 'Java', but I wanted to show that this isn't the case anymore, and I'm going to walk through a simple web application using Scala and Spring 4. Here's the toolset I'm using in this demo:
+I think there's a natural tendency when you hear 'Spring' to think 'Java', but I wanted to show that this isn't the case anymore, and I'm going to walk through a simple web application using Scala and Spring 4. Here's the toolset I'm using here:
 
 * [SBT](http://www.scala-sbt.org/)
 * [Jetty](http://www.eclipse.org/jetty/)
@@ -56,11 +56,11 @@ So first off, you'll notice I'm not using [Maven](http://maven.apache.org/) or [
 
     seq(webSettings : _*)
 
-      libraryDependencies ++= Seq(
-          "org.springframework" % "spring-webmvc" % "4.0.0.RELEASE",
-          "org.eclipse.jetty" % "jetty-webapp" % "9.1.0.v20131115" % "container, compile",
-          "org.eclipse.jetty" % "jetty-jsp" % "9.1.0.v20131115" % "container"
-          )
+    libraryDependencies ++= Seq(
+      "org.springframework" % "spring-webmvc" % "4.0.0.RELEASE",
+      "org.eclipse.jetty" % "jetty-webapp" % "9.1.0.v20131115" % "container, compile",
+      "org.eclipse.jetty" % "jetty-jsp" % "9.1.0.v20131115" % "container"
+    )
 
 In `projects/plugins.sbt` there are two plugins, one for running the web application within SBT and the other to create [IntelliJ](http://www.jetbrains.com/idea/) project files.
 
@@ -68,11 +68,51 @@ In `projects/plugins.sbt` there are two plugins, one for running the web applica
 
     addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.5.2")
 
-The project uses the 'standard' Java convention of having a `src` folder at the root, followed by `webapp` which includes the web application configuration and static resources as well as the source folder called `scala`. Within the `scala` directory there is a namespaced directory structure of `com/robb1e/helloworld` although in Scala unlike in Java there is not a one to one mapping of file to classname. But let's first head into `webapp/WEB-INF/web.xml`. This is the deployment descriptor from the [Servlet standard](http://en.wikipedia.org/wiki/Java_Servlet). 
+The project uses the 'standard' Java convention of having a `src` folder at the root, followed by `webapp` which includes the web application configuration and static resources as well as the source folder called `scala`. Within the `scala` directory there is a namespaced directory structure of `com/robb1e/helloworld` although in Scala unlike in Java there is not a one to one mapping of file to classname. In the codebase I've included the `Config` class in the root of the `src/scala` directory to demonstrate this. But let's first head into `webapp/WEB-INF/web.xml`. This is the deployment descriptor from the [Servlet standard](http://en.wikipedia.org/wiki/Java_Servlet). 
 
 ## Configuration
 
-We essentially are telling Spring to handle all HTTP requests from the root context (i.e. '/'). We are also passing a reference to a configuration class, in this case `com.robb1e.helloworld.Config`. 
+### Web.xml
+
+This file is what's loaded by the servlet container and although it looks big, there's not all that going on here.
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+      <display-name>Scala Spring MVC 4 Web Site</display-name>
+      <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <init-param>
+          <param-name>contextClass</param-name>
+          <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+        </init-param>
+        <init-param>
+          <param-name>contextConfigLocation</param-name>
+          <param-value>com.robb1e.helloworld.Config</param-value>
+        </init-param>
+      </servlet>
+      <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+      </servlet-mapping>
+    </web-app>
+    
+The second `init-param` element within the `servlet` element defines the class with the application configuration which we'll come to shortly.    
+    
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>com.robb1e.helloworld.Config</param-value>
+    </init-param>
+    
+We then tell the defined servlet to serve the root path
+
+    <servlet-mapping>
+      <servlet-name>dispatcher</servlet-name>
+      <url-pattern>/</url-pattern>
+    </servlet-mapping>    
+
+### Wiring
 
 This configuration uses Spring annotations `@ComponentScan` to declare which package to look for Spring wiring to occur in. The `@Bean` annotation makes the `viewResolver` available which is required by the controller to render HTML.
 
@@ -116,7 +156,9 @@ To show a simple dependency this example includes a 'service' which provides the
 
     }
 
-The `trait` isn't strictly required, but enables me to introduce the comparison between [Java Interfaces](http://docs.oracle.com/javase/tutorial/java/concepts/interface.html) and how they are used in testing.
+The `trait` isn't strictly required, but enables me to introduce the comparison between [Java Interfaces](http://docs.oracle.com/javase/tutorial/java/concepts/interface.html) and how they are used in testing and [Java Abstract classes](http://docs.oracle.com/javase/tutorial/java/IandI/abstract.html) in that they can be partially implemented.
+
+## Controller
 
 The dependency of the `HelloWorldName` gets injected into the controller using the `autowired` command in the class definition. The class has a constructor which requires a `HelloWorldName` class and that's created and injected from the snippet above. 
 
@@ -137,8 +179,6 @@ The dependency of the `HelloWorldName` gets injected into the controller using t
         "index"
       }
     }
-
-## Controller
 
 There's a lot going on here, let's break it down, starting with the package definition. The interesting thing with Scala is the package isn't dependent on the directory structure. In the example it is, but it doesn't need to be. Say good bye to those empty directories.
 
