@@ -6,9 +6,10 @@ scalaVersion := "2.10.2"
 
 seq(webSettings : _*)
 
+resolvers += "Spring" at "http://repo.spring.io/libs-milestone"
+
 libraryDependencies ++= Seq(
-  "org.springframework" % "spring-webmvc" % "4.0.0.RELEASE",
-  "org.eclipse.jetty" % "jetty-webapp" % "9.1.0.v20131115" % "container, compile",
-  "org.eclipse.jetty" % "jetty-jsp" % "9.1.0.v20131115" % "container"
+  "org.springframework.boot" % "spring-boot-starter-web" % "1.0.0.RC1",
+  "org.apache.tomcat.embed" % "tomcat-embed-jasper" % "7.0.47" % "container, compile"
 )
 

@@ -1,17 +1,16 @@
 package com.robb1e.helloworld
 
+import scala.collection.JavaConversions._
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod}
+import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
-@RequestMapping(Array("/"))
 class HelloWorldController @Autowired() (nameService: Name) {
 
-  @RequestMapping(method = Array(RequestMethod.GET))
-  def index (model: Model) = {
-    model.addAttribute("name", nameService.name)
+  @RequestMapping(Array("/"))
+  def index(model: java.util.Map[String, Any]): String = {
+    model += ("name" -> nameService.name)
     "index"
   }
 
