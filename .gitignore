@@ -1,3 +1,9 @@
+.cache
+.classpath
+.project
+.settings
 target
 project/target
 .idea_modules
+/bin
+/build

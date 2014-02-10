@@ -1,18 +1,26 @@
-package com.robb1e.helloworld
 
-import org.springframework.context.annotation.{Bean, ComponentScan}
-import org.springframework.web.servlet.view.{InternalResourceViewResolver, JstlView}
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.boot.web.SpringBootServletInitializer
 
-@ComponentScan(basePackages = Array("com.robb1e.helloworld"))
-class Config {
+import org.springframework.context.annotation.{ ComponentScan, Configuration }
 
-    @Bean
-    def viewResolver = {
-        val viewResolver = new InternalResourceViewResolver
-        viewResolver.setViewClass(classOf[JstlView])
-        viewResolver.setPrefix("/WEB-INF/views/")
-        viewResolver.setSuffix(".jsp")
-        viewResolver
-    }
+object Config {
+
+  def main(args: Array[String]): Unit = {
+    SpringApplication.run(classOf[Config])
+  }
+
+}
+
+@EnableAutoConfiguration
+@Configuration
+@ComponentScan
+class Config extends SpringBootServletInitializer {
+
+  override def configure(application: SpringApplicationBuilder): SpringApplicationBuilder = {
+    application.sources(classOf[Config])
+  }
 
 }
