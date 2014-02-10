@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod}
 
 @Controller
 @RequestMapping(Array("/"))
-class HelloWorldController @Autowired() (helloWorldService: HelloWorldName) {
+class HelloWorldController @Autowired() (nameService: Name) {
 
   @RequestMapping(method = Array(RequestMethod.GET))
   def index (model: Model) = {
-    model.addAttribute("name", helloWorldService.name)
+    model.addAttribute("name", nameService.name)
     "index"
   }
 

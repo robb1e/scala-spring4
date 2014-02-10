@@ -2,12 +2,12 @@ package com.robb1e.helloworld
 
 import org.springframework.stereotype.Service
 
-trait HelloWorldName {
+trait Name {
   def name: String
 }
 
 @Service
-class HelloWorldService extends HelloWorldName {
+class NameService extends Name {
 
   def name = "world"
 
