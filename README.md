@@ -145,12 +145,12 @@ To show a simple dependency this example includes a 'service' which provides the
 
     import org.springframework.stereotype.Service
 
-    trait HelloWorldName {
+    trait Name {
       def name: String
     }
 
     @Service
-    class HelloWorldService extends HelloWorldName {
+    class NameService extends Name {
 
       def name = "world"
 
@@ -160,7 +160,7 @@ The `trait` isn't strictly required, but enables me to introduce the comparison 
 
 ## Controller
 
-The dependency of the `HelloWorldName` gets injected into the controller using the `autowired` command in the class definition. The class has a constructor which requires a `HelloWorldName` class and that's created and injected from the snippet above. 
+The dependency of the `Name` gets injected into the controller using the `autowired` command in the class definition. The class has a constructor which requires a `Name` class and that's created and injected from the snippet above. 
 
     package com.robb1e.helloworld
 
@@ -171,11 +171,11 @@ The dependency of the `HelloWorldName` gets injected into the controller using t
 
     @Controller
     @RequestMapping(Array("/"))
-    class HelloWorldController @Autowired() (helloWorldService: HelloWorldName) {
+    class HelloWorldController @Autowired() (nameService: Name) {
 
       @RequestMapping(method = Array(RequestMethod.GET))
       def index (model: Model) = {
-        model.addAttribute("name", helloWorldService.name)
+        model.addAttribute("name", nameService.name)
         "index"
       }
     }
@@ -191,17 +191,17 @@ We have to import a few classes, `Autowired` for the automatic injecting of depe
     import org.springframework.ui.Model
     import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod}
 
-Here we declare that this class is a controller and it listens to the path '/'. We also declare it to be autowired and define the `HelloWorldName` dependency.
+Here we declare that this class is a controller and it listens to the path '/'. We also declare it to be autowired and define the `Name` dependency.
 
     @Controller
     @RequestMapping(Array("/"))
-    class HelloWorldController @Autowired() (helloWorldService: HelloWorldName) {
+    class HelloWorldController @Autowired() (nameService: Name) {
 
 Now we map our method to the HTTP method that comes through on the path this class is listening too. We receive the model and add our name to it so that it's used in the view.
 
       @RequestMapping(method = Array(RequestMethod.GET))
       def index (model: Model) = {
-        model.addAttribute("name", helloWorldService.name)
+        model.addAttribute("name", nameService.name)
         "index"
       }
     }
