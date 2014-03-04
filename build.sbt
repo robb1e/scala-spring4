@@ -4,6 +4,8 @@ version := "1.0"
 
 scalaVersion := "2.10.2"
 
+sbtVersion := "0.13.1"
+
 seq(webSettings : _*)
 
 libraryDependencies ++= Seq(
